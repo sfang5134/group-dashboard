@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delta Delay Risk Command Center</title>
+  <link rel="stylesheet" href="../../docs/dashboard.css">
+</head>
+<body data-csv="../../docs/delta_delay_proposal_sample.csv">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-lockup">
+        <svg class="delta-logo" viewBox="0 0 180 44" aria-label="Delta logo" role="img">
+          <polygon points="12,6 28,6 20,20" fill="#c8102e"></polygon>
+          <polygon points="12,24 28,24 20,38" fill="#8b1025"></polygon>
+          <text x="40" y="29" fill="#ffffff" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="2">DELTA</text>
+        </svg>
+        <span class="brand-tag">Delay Risk Command Center</span>
+      </div>
+      <nav class="topnav" aria-label="Dashboard sections">
+        <a href="#summary">Overview</a>
+        <a href="#heatmap">Heat Map</a>
+        <a href="#insights">Insights</a>
+        <a href="#controls">Filters</a>
+        <a href="#queue">Flight Queue</a>
+        <a href="#detail">Flight Detail</a>
+      </nav>
+    </div>
+  </header>
+  <div class="shell">
+    <section class="hero">
+      <div class="card hero-card">
+        <div class="eyebrow">Delta-inspired interface</div>
+        <h1>Predictable delay patterns, made operational.</h1>
+        <p class="hero-copy">
+          Interactive proposal dashboard for pre-departure delay triage. Filter the flight list, compare risk mix,
+          and inspect the operational drivers behind each score before disruption ripples across the network.
+          Show how earlier intervention protects customer trust, premium brand perception, and avoidable disruption cost.
+        </p>
+        <div class="hero-pills">
+          <span class="pill">Keep climbing with earlier intervention</span>
+          <span class="pill">Operational risk by flight</span>
+          <span class="pill">Delta color system</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Today’s Control Tower View</h2>
+        <div class="accent-line"></div>
+        <p class="muted">
+          Use this board to surface the most delay-prone departures, prioritize intervention on high-risk flights,
+          and explain why the model is escalating each record.
+        </p>
+        <div class="mini-grid">
+          <div class="chip">Late-day banks</div>
+          <div class="chip">Inbound aircraft risk</div>
+          <div class="chip">Weather severity</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pitch-grid">
+      <div class="card pitch-card">
+        <div class="summary-label">Why the CMO should care</div>
+        <h2>Fewer surprise delays means stronger trust in the Delta brand.</h2>
+        <p class="muted">
+          This pilot creates earlier visibility into departures most likely to break the promise of a smooth premium experience.
+          That gives Delta time to target messaging, reaccommodation, and service recovery before customers feel the disruption.
+        </p>
+      </div>
+      <div class="card pitch-card">
+        <div class="summary-label">Commercial upside</div>
+        <h2>Turn operational foresight into loyalty protection.</h2>
+        <p class="muted">
+          The same risk signal can support proactive notifications, elite-customer prioritization, and clearer disruption storytelling,
+          helping marketing and customer teams preserve confidence when operations tighten.
+        </p>
+      </div>
+    </section>
+
+    <section class="summary-grid" id="summary">
+      <div class="card">
+        <div class="summary-label">Flights in view</div>
+        <div class="summary-value" id="summary-count">0</div>
+        <div class="muted">Records after current filters</div>
+      </div>
+      <div class="card">
+        <div class="summary-label">Average risk</div>
+        <div class="summary-value" id="summary-risk">0%</div>
+        <div class="muted">Mean predicted probability</div>
+      </div>
+      <div class="card">
+        <div class="summary-label">Average delay</div>
+        <div class="summary-value" id="summary-delay">0 min</div>
+        <div class="muted">Departure delay across visible flights</div>
+      </div>
+      <div class="card">
+        <div class="summary-label">Highest-risk flight</div>
+        <div class="summary-value" id="summary-top">DL0000</div>
+        <div class="muted" id="summary-top-detail">Waiting for data</div>
+      </div>
+    </section>
+
+    <section class="card heatmap-card" id="heatmap">
+      <div class="heatmap-head">
+        <div>
+          <h2>Departure Delay Heat Map</h2>
+          <p class="muted">Average delay minutes by day of week and departure hour. Click a cell to focus that operating window.</p>
+        </div>
+        <div id="heatmap-selection" class="chip">All operating windows</div>
+      </div>
+      <div class="heatmap-wrap">
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+      </div>
+      <div class="heatmap-legend">
+        <span class="muted">Lower delay</span>
+        <div class="legend-bar"></div>
+        <span class="muted">Higher delay</span>
+      </div>
+    </section>
+
+    <section class="insight-grid" id="insights">
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <h2>Top Delayed Routes</h2>
+            <p class="muted">Click a bar to focus a route in the flight queue.</p>
+          </div>
+          <div id="route-selection" class="chip">All routes</div>
+        </div>
+        <canvas id="routes-chart" height="260"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <h2>Top Delayed Origin Airports</h2>
+            <p class="muted">Click a bar to set the origin filter.</p>
+          </div>
+          <div id="airport-selection" class="chip">All origins</div>
+        </div>
+        <canvas id="airports-chart" height="260"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <h2>Delay Distribution</h2>
+            <p class="muted">Histogram of departure delay minutes for the current view.</p>
+          </div>
+        </div>
+        <canvas id="histogram-chart" height="260"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <h2>Delay vs. Weather Severity</h2>
+            <p class="muted">Select a point to jump to a specific flight.</p>
+          </div>
+        </div>
+        <canvas id="scatter-chart" height="260"></canvas>
+      </div>
+
+      <div class="card chart-card chart-card-wide">
+        <div class="chart-head">
+          <div>
+            <h2>Delay Cost Today vs. Mitigated Scenario</h2>
+            <p class="muted">Modeled cost view for the currently filtered flights.</p>
+          </div>
+        </div>
+        <canvas id="roi-chart" height="220"></canvas>
+      </div>
+    </section>
+
+    <section class="card" id="controls">
+      <div class="control-grid">
+        <div class="field">
+          <label for="search-input">Search flight, route, airport, or driver</label>
+          <input id="search-input" placeholder="Try ATL, JFK, weather, DL1198">
+        </div>
+        <div class="field">
+          <label for="band-filter">Risk band</label>
+          <select id="band-filter">
+            <option value="All">All bands</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="origin-filter">Origin</label>
+          <select id="origin-filter">
+            <option value="All">All origins</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sort-filter">Sort by</label>
+          <select id="sort-filter">
+            <option value="predicted_probability_desc">Highest risk first</option>
+            <option value="dep_delay_minutes_desc">Highest delay first</option>
+            <option value="departure_hour_asc">Earliest departure first</option>
+            <option value="flight_date_asc">Earliest date first</option>
+          </select>
+        </div>
+      </div>
+      <div class="button-row">
+        <button class="primary" id="focus-high">Focus high-risk flights</button>
+        <button class="secondary" id="reset-filters">Reset filters</button>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <div class="card" id="queue">
+        <h2>Flight Queue</h2>
+        <p class="muted">Click a row to inspect full score context. Click headers to sort instantly.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-column="flight_id">Flight</th>
+                <th data-column="flight_date">Date</th>
+                <th data-column="route">Route</th>
+                <th data-column="departure_hour">Sched Dep</th>
+                <th data-column="dep_delay_minutes">Delay Min</th>
+                <th data-column="predicted_probability">Predicted Risk</th>
+                <th data-column="risk_band">Band</th>
+              </tr>
+            </thead>
+            <tbody id="flight-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="detail">
+        <div class="detail-head">
+          <div>
+            <h2>Flight Detail</h2>
+            <div class="muted">Operational narrative for the selected flight</div>
+          </div>
+          <div id="detail-band"></div>
+        </div>
+        <div id="detail-panel" class="muted">Loading highest-risk flight...</div>
+
+        <div class="accent-line"></div>
+        <h3>Risk Mix</h3>
+        <div class="chart-row" id="mix-chart"></div>
+
+        <h3>Top Drivers in View</h3>
+        <div class="driver-list" id="driver-cloud"></div>
+
+        <p class="footer-note">
+          This prototype is interactive at the dashboard layer and uses the scored sample output prepared for the Delta delay-risk proposal.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script src="../../docs/dashboard-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="../../docs/dashboard.js"></script>
+</body>
+</html>
